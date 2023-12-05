@@ -9,7 +9,7 @@
 using namespace std;
 //using namespace cv;
 using namespace chrono;
-struct PM {//Æ½Ãæ
+struct PM {//å¹³é¢
     double a, b, c;
     double x, y, z;
     PM() {}
@@ -73,15 +73,15 @@ void read_stl(string path, vector<double>& triangles)
     //freopen("CON", "w", stdout);
 }
 
-double findjiaodian(PM a, double x, double y, double z, double vx, double vy, double vz) {//µã¼Ó·¨ÏòÁ¿·½Ê½±íÊ¾Ö±Ïß
+double findjiaodian(PM a, double x, double y, double z, double vx, double vy, double vz) {//ç‚¹åŠ æ³•å‘é‡æ–¹å¼è¡¨ç¤ºç›´çº¿
     double vp1, vp2, vp3, n1, n2, n3, v1, v2, v3, m1, m2, m3, t, vpt;
     vp1 = a.a;vp2 = a.b;vp3 = a.c;n1 = a.x;n2 = a.y;n3 = a.z;v1 = vx;v2 = vy;v3 = vz;m1 = x;m2 = y;m3 = z;
-    //ÒÑÖªÖ±ÏßL¹ıµãm£¨m1£¬m2£¬m3£©£¬ÇÒ·½ÏòÏòÁ¿ÎªVL£¨v1£¬v2£¬v3£©£¬Æ½ÃæP¹ıµãn£¨n1£¬n2£¬n3£©£¬ÇÒ·¨Ïß·½ÏòÏòÁ¿ÎªVP£¨vp1£¬vp2£¬vp3£©
+    //å·²çŸ¥ç›´çº¿Lè¿‡ç‚¹mï¼ˆm1ï¼Œm2ï¼Œm3ï¼‰ï¼Œä¸”æ–¹å‘å‘é‡ä¸ºVLï¼ˆv1ï¼Œv2ï¼Œv3ï¼‰ï¼Œå¹³é¢Pè¿‡ç‚¹nï¼ˆn1ï¼Œn2ï¼Œn3ï¼‰ï¼Œä¸”æ³•çº¿æ–¹å‘å‘é‡ä¸ºVPï¼ˆvp1ï¼Œvp2ï¼Œvp3ï¼‰
     vpt = v1 * vp1 + v2 * vp2 + v3 * vp3;
-    //Ê×ÏÈÅĞ¶ÏÖ±ÏßÊÇ·ñÓëÆ½ÃæÆ½ĞĞ
+    //é¦–å…ˆåˆ¤æ–­ç›´çº¿æ˜¯å¦ä¸å¹³é¢å¹³è¡Œ
     if (vpt == 0)
     {
-        return -1;//Ö»ÓĞÔÚ0-1Ö®¼ä²ÅÊÇÏß¶ÎÉÏ£¬·µ»Ø-1±íÊ¾Ã»ÓĞ½»µã
+        return -1;//åªæœ‰åœ¨0-1ä¹‹é—´æ‰æ˜¯çº¿æ®µä¸Šï¼Œè¿”å›-1è¡¨ç¤ºæ²¡æœ‰äº¤ç‚¹
     }
     else
     {
@@ -165,22 +165,22 @@ void judgejiao(PM p, point a, point b) {
     }
 }
 
-double dotproduct(point a, point b) {//µã³Ë
+double dotproduct(point a, point b) {//ç‚¹ä¹˜
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-double moudle(point a) {//ÏòÁ¿µÄÄ£
+double moudle(point a) {//å‘é‡çš„æ¨¡
     return sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
 }
 
-bool pointcmp(PM p, point a, point b) {//ÅĞ¶ÏµãaºÍµãbÔÚÆ½ÃæpµÄÒâÒåÏÂµÄ´óĞ¡¹ØÏµ£¨¼´Æ½Ãæp·¨ÏòÁ¿ÒâÒåÏÂµÄ´óĞ¡¹ØÏµ£©
+bool pointcmp(PM p, point a, point b) {//åˆ¤æ–­ç‚¹aå’Œç‚¹båœ¨å¹³é¢pçš„æ„ä¹‰ä¸‹çš„å¤§å°å…³ç³»ï¼ˆå³å¹³é¢pæ³•å‘é‡æ„ä¹‰ä¸‹çš„å¤§å°å…³ç³»ï¼‰
     double d;
     d = dotproduct(point(a.x - b.x, a.y - b.y, a.z - b.z), point(p.a, p.b, p.c));
     d = d / moudle(point(p.a, p.b, p.c));
     return d < 0;
 }
 
-bool cmp1(triangle a, triangle b) {//ÅĞ¶ÏÁ½¸öÈı½ÇĞÎ¶ÔÓÚdownÆ½Ãæ¶øÑÔµÄÎ»ÖÃÏÈºó¹ØÏµ
+bool cmp1(triangle a, triangle b) {//åˆ¤æ–­ä¸¤ä¸ªä¸‰è§’å½¢å¯¹äºdownå¹³é¢è€Œè¨€çš„ä½ç½®å…ˆåå…³ç³»
     point ma, mb;
     ma = a.a;
     mb = b.a;
@@ -191,7 +191,7 @@ bool cmp1(triangle a, triangle b) {//ÅĞ¶ÏÁ½¸öÈı½ÇĞÎ¶ÔÓÚdownÆ½Ãæ¶øÑÔµÄÎ»ÖÃÏÈºó¹ØÏ
     return pointcmp(down, ma, mb);
 }
 
-bool cmp2(triangle a, triangle b) {//ÅĞ¶ÏÁ½¸öÈı½ÇĞÎ¶ÔÓÚupÆ½Ãæ¶øÑÔµÄÎ»ÖÃÏÈºó¹ØÏµ
+bool cmp2(triangle a, triangle b) {//åˆ¤æ–­ä¸¤ä¸ªä¸‰è§’å½¢å¯¹äºupå¹³é¢è€Œè¨€çš„ä½ç½®å…ˆåå…³ç³»
     point ma, mb;
     ma = a.a;
     mb = b.a;
@@ -202,7 +202,7 @@ bool cmp2(triangle a, triangle b) {//ÅĞ¶ÏÁ½¸öÈı½ÇĞÎ¶ÔÓÚupÆ½Ãæ¶øÑÔµÄÎ»ÖÃÏÈºó¹ØÏµ
     return pointcmp(up, ma, mb);
 }
 
-bool cmp3(triangle a, PM p) {//ÅĞ¶ÏÈı½ÇĞÎÔÚÆ½ÃæµÄÄÄ±ß
+bool cmp3(triangle a, PM p) {//åˆ¤æ–­ä¸‰è§’å½¢åœ¨å¹³é¢çš„å“ªè¾¹
     point m = a.a;
     if (pointcmp(p, a.b, m))m = a.b;
     if (pointcmp(p, a.c, m))m = a.c;
@@ -217,7 +217,7 @@ bool cmp3(triangle a, PM p) {//ÅĞ¶ÏÈı½ÇĞÎÔÚÆ½ÃæµÄÄÄ±ß
 int main(int argc, char const* argv[])
 {
     
-    //////////////////////////////´úÂë¿ªÊ¼////////////////////////////
+    //////////////////////////////ä»£ç å¼€å§‹////////////////////////////
     cout << fixed << setprecision(6);
     vector<double> triangles_all;
     read_stl("new.stl", triangles_all);
@@ -229,7 +229,7 @@ int main(int argc, char const* argv[])
         triangle p = triangle(a, b, c);
         triangles.push_back(p);
     }
-    //up´æz×î´óµÄµã,down´æz×îĞ¡µÄµãavavbbab
+    //upå­˜zæœ€å¤§çš„ç‚¹,downå­˜zæœ€å°çš„ç‚¹
     up.z = mi; down.z = ma;
     for (int i = 0; i < triangles.size(); ++i) {
         if (up.z < triangles[i].a.z) {
@@ -250,9 +250,9 @@ int main(int argc, char const* argv[])
         if (down.z > triangles[i].c.z) {
             down = PM(0, 0, 1, triangles[i].c.x, triangles[i].c.y, triangles[i].c.z);
         }
-    }//ÕÒupºÍdownµã·¨Ê½ÖĞµÄµã
+    }//æ‰¾upå’Œdownç‚¹æ³•å¼ä¸­çš„ç‚¹
 
-    //¼ÆËãupµÄ·¨ÏòÁ¿
+    //è®¡ç®—upçš„æ³•å‘é‡
     double X = 0, Y = 466 - 458, Z = 348 - 361;
     double XX = 1, YY = 0, ZZ = 0;
     up.a = Y * ZZ - Z * YY;
@@ -262,17 +262,17 @@ int main(int argc, char const* argv[])
         up.a = -up.a;
         up.b = -up.b;
         up.c = -up.c;
-    }//upÃæÓ¦ÏòÏÂÒÆ¶¯£¬·¨ÏòÁ¿zÖáÈô´óÓÚ0Ôò·­×ª
+    }//upé¢åº”å‘ä¸‹ç§»åŠ¨ï¼Œæ³•å‘é‡zè½´è‹¥å¤§äº0åˆ™ç¿»è½¬
 
-    vector<point>points, tmppoints;//¼ÇÂ¼ÖØĞÄµã
+    vector<point>points, tmppoints;//è®°å½•é‡å¿ƒç‚¹
 
-    double wucha = 1e9;//³¬¹ıwuchaÔòÈÏÎªºó°ë²¿·ÖÃ»ÓĞ±ØÒª
+    double wucha = 1e9;//è¶…è¿‡wuchaåˆ™è®¤ä¸ºååŠéƒ¨åˆ†æ²¡æœ‰å¿…è¦
 
-    double len = 1;//Æ½ÒÆÊ±µÄ³¤¶È
+    double len = 1;//å¹³ç§»æ—¶çš„é•¿åº¦
 
-    long long howmany = 90;//ÉÏÏÂÈ¡¶àÉÙ²ã
+    long long howmany = 90;//ä¸Šä¸‹å–å¤šå°‘å±‚
 
-    //downÃæÏòÉÏÆ½ÒÆ
+    //downé¢å‘ä¸Šå¹³ç§»
     //freopen("CON", "w", stdout);
     sort(triangles.begin(), triangles.end(), cmp1);
     double fp = sqrt(down.a * down.a + down.b * down.b + down.c * down.c);
@@ -307,7 +307,7 @@ int main(int argc, char const* argv[])
         }
         mp.clear();
         if (flag != -1) {
-            if (ccnt > 15)//ÒòÎªÊäÈëÆ½Ãæ²»ÍêÈ«Æ½ĞĞ£¬ËùÒÔÉ¾³ıÒ»Ğ©µãÊıÉÙµÄÇĞÃæµã
+            if (ccnt > 15)//å› ä¸ºè¾“å…¥å¹³é¢ä¸å®Œå…¨å¹³è¡Œï¼Œæ‰€ä»¥åˆ é™¤ä¸€äº›ç‚¹æ•°å°‘çš„åˆ‡é¢ç‚¹
                 points.push_back(point(xx, yy, zz));
         }
         flag = 0;
@@ -320,10 +320,10 @@ int main(int argc, char const* argv[])
         }
         down.x += down.a / fp * len;
         down.y += down.b / fp * len;
-        down.z += down.c / fp * len;//·¨ÏòÁ¿·½ÏòÒÆ¶¯len
+        down.z += down.c / fp * len;//æ³•å‘é‡æ–¹å‘ç§»åŠ¨len
     }
 
-    //upÏòÏÂÆ½ÒÆ
+    //upå‘ä¸‹å¹³ç§»
     //freopen("CON", "w", stdout);
     sort(triangles.begin(), triangles.end(), cmp2);
     fp = sqrt(up.a * up.a + up.b * up.b + up.c * up.c);
@@ -349,7 +349,7 @@ int main(int argc, char const* argv[])
         }
         mp.clear();
         if (flag != -1) {
-            if (ccnt > 10)//ÒòÎªÊäÈëÆ½Ãæ²»ÍêÈ«Æ½ĞĞ£¬ËùÒÔÉ¾³ıÒ»Ğ©µãÊıÉÙµÄÇĞÃæµã
+            if (ccnt > 10)//å› ä¸ºè¾“å…¥å¹³é¢ä¸å®Œå…¨å¹³è¡Œï¼Œæ‰€ä»¥åˆ é™¤ä¸€äº›ç‚¹æ•°å°‘çš„åˆ‡é¢ç‚¹
                 tmppoints.push_back(point(xx, yy, zz));
         }
         flag = 0;
@@ -362,7 +362,7 @@ int main(int argc, char const* argv[])
         }
         up.x += up.a / fp * len;
         up.y += up.b / fp * len;
-        up.z += up.c / fp * len;//·¨ÏòÁ¿·½ÏòÒÆ¶¯len
+        up.z += up.c / fp * len;//æ³•å‘é‡æ–¹å‘ç§»åŠ¨len
     }
 
     reverse(tmppoints.begin(), tmppoints.end());
