@@ -229,7 +229,7 @@ int main(int argc, char const* argv[])
         triangle p = triangle(a, b, c);
         triangles.push_back(p);
     }
-    //up存z最大的点,down存z最小的点aaa
+    //up存z最大的点,down存z最小的点avavbbab
     up.z = mi; down.z = ma;
     for (int i = 0; i < triangles.size(); ++i) {
         if (up.z < triangles[i].a.z) {
