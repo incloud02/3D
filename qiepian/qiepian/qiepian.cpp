@@ -49,7 +49,7 @@ vector<point>points;//骨架点
 vector<point>np;//选出的法面切片的骨架点
 vector<PM>fa;//法面
 vector<point>qiedian[1005];
-map<double, int>mp;
+//map<double, int>mp;
 int ad[1000005][3];//记录每个三角形的相邻三角形编号
 int sad[1000005];//每个三角形相邻三角形的个数
 map<int, point>mpp;
@@ -58,6 +58,10 @@ map<int, int>vis;
 map<int, int>ss;
 void show(triangle a) {
     cout << a.a.x << " " << a.a.y << " " << a.a.z << endl << a.b.x << " " << a.b.y << " " << a.b.z << endl << a.c.x << " " << a.c.y << " " << a.c.z << endl;
+}
+
+double dotproduct(point a, point b) {//点乘
+    return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 double findjiaodian(PM a, double x, double y, double z, double vx, double vy, double vz) {//点加法向量方式表示直线
@@ -77,12 +81,16 @@ double findjiaodian(PM a, double x, double y, double z, double vx, double vy, do
     }
 }
 
-void judgejiao(int i, int j, PM p, point a, point b) {
+point judgejiao(int i, int j, PM p, point a, point b) {
+    point oa = a - p.o, ob = b - p.o;
+    int flag = 0;
+    if (fabs(dotproduct(oa, p.d)) <= 1e-9 && fabs(dotproduct(ob, p.d)) <= 1e-9)flag = 1;
+    if (flag)return point(1000000007, 1000000007, 1000000007);
     double vx, vy, vz;
     vx = b.x - a.x;
     vy = b.y - a.y;
     vz = b.z - a.z;
-    double f, f1;
+    /*double f, f1;
     f = a.x;
     f = f * 1000 + a.y;
     f = f * 1000 + a.z;
@@ -94,24 +102,24 @@ void judgejiao(int i, int j, PM p, point a, point b) {
     f1 = f1 * 1000 + vz + a.z;
     f1 = f1 * 1000 + a.x;
     f1 = f1 * 1000 + a.y;
-    f1 = f1 * 1000 + a.z;
+    f1 = f1 * 1000 + a.z;*/
     double t;
-    if (mp.count(f) == 0 && mp.count(f1) == 0) {
-        t = findjiaodian(p, a.x, a.y, a.z, vx, vy, vz);
-        mp[f] = 1;
-        mp[f1] = 1;
+    //if (mp.count(f) == 0 && mp.count(f1) == 0) {
+    t = findjiaodian(p, a.x, a.y, a.z, vx, vy, vz);
+        //mp[f] = 1;
+        //mp[f1] = 1;
+    //}
+    //else {
+        //t = -1;
+    //}
+    if (t >= 0 && t <= 1) {
+        //qiedian[i].push_back(point(a.x + t * vx, a.y + t * vy, a.z + t * vz));
+        return point(a.x + t * vx, a.y + t * vy, a.z + t * vz);
+        //hao[i].push_back(j);
     }
     else {
-        t = -1;
+        return point(-1000000007, -1000000007, -1000000007);
     }
-    if (t >= 0 && t <= 1) {
-        qiedian[i].push_back(point(a.x + t * vx, a.y + t * vy, a.z + t * vz));
-        hao[i].push_back(j);
-    }
-}
-
-double dotproduct(point a, point b) {//点乘
-    return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 double moudle(point a) {//向量的模
@@ -200,8 +208,8 @@ void arccut(int a, int b) {
     point w1 = d;
     point w2 = fa[a].o - o;
     double len = dotproduct(w1, w2) / moudle(w1) / moudle(w1);
-    printline(o, d, 0, len, 1);
-    printline(o, w2, 0, 10, 1);
+    //printline(o, d, 0, len, 1);
+    //printline(o, w2, 0, 10, 1);
     point ao = o + d * len;
     w2 = fa[b].o - o;
     len = dotproduct(w1, w2) / moudle(w1) / moudle(w1);
@@ -223,7 +231,7 @@ void arccut(int a, int b) {
     //cerr << angle << '\n';
     int ff = b;
 
-    for (double i = angle; i >= 0; i -= tt) {
+    for (double i = angle; i > 0; i -= tt) {
         point v = d * (1 - cos(-i)) * dotproduct(ob, d) + ob * cos(-i) + chacheng(d, ob) * sin(-i) + bo;
         PM p = PM(v, chacheng(d, v - o));
         //if (a == 0) 
@@ -234,13 +242,45 @@ void arccut(int a, int b) {
             }*/
             //cout << '\n';
         }
-        mp.clear();
+        //mp.clear();
         qiedian[ff].clear();
         hao[ff].clear();
         for (int j = 0; j < triangles.size(); j++) {
-            judgejiao(ff, j, p, triangles[j].a, triangles[j].b);
-            judgejiao(ff, j, p, triangles[j].a, triangles[j].c);
-            judgejiao(ff, j, p, triangles[j].b, triangles[j].c);
+            point p1 = judgejiao(ff, j, p, triangles[j].a, triangles[j].b);
+            point p2 = judgejiao(ff, j, p, triangles[j].a, triangles[j].c);
+            point p3 = judgejiao(ff, j, p, triangles[j].b, triangles[j].c);
+            if (p1 == point(1000000007, 1000000007, 1000000007)) {
+                qiedian[ff].push_back(triangles[j].a);
+                qiedian[ff].push_back(triangles[j].b);
+                hao[ff].push_back(j);
+                hao[ff].push_back(j);
+            }
+            else if (p2 == point(1000000007, 1000000007, 1000000007)) {
+                qiedian[ff].push_back(triangles[j].a);
+                qiedian[ff].push_back(triangles[j].c);
+                hao[ff].push_back(j);
+                hao[ff].push_back(j);
+            }
+            else if (p3 == point(1000000007, 1000000007, 1000000007)) {
+                qiedian[ff].push_back(triangles[j].b);
+                qiedian[ff].push_back(triangles[j].c);
+                hao[ff].push_back(j);
+                hao[ff].push_back(j);
+            }
+            else {
+                if (!(p1 == point(-1000000007, -1000000007, -1000000007))) {
+                    qiedian[ff].push_back(p1);
+                    hao[ff].push_back(j);
+                }
+                if (!(p2 == point(-1000000007, -1000000007, -1000000007))) {
+                    qiedian[ff].push_back(p2);
+                    hao[ff].push_back(j);
+                }
+                if (!(p3 == point(-1000000007, -1000000007, -1000000007))) {
+                    qiedian[ff].push_back(p3);
+                    hao[ff].push_back(j);
+                }
+            }
         }
         ff--;
     }
@@ -248,14 +288,42 @@ void arccut(int a, int b) {
 }
 
 void lu(int i, int j) {
-    qiedian[i].push_back(mpp[hao[i][j]]);
-    for (int p = 0; p < sad[hao[i][j]]; p++) {
-        if (mpp.count(ad[hao[i][j]][p]) && vis[ad[hao[i][j]][p]] == 0) {
-            lu(i, ad[hao[i][j]][p]);
+    cout << "    " << i << " " << j << endl;
+    qiedian[i].push_back(mpp[j]);
+    vis[j] = 1;
+    for (int p = 0; p < sad[j]; p++) {
+        cout << j << " " << p << endl;
+        if (mpp.count(ad[j][p]) && vis[ad[j][p]] == 0) {
+            lu(i, ad[j][p]);
         }
     }
 }
 
+void findlu(int i) {
+    mpp.clear();
+    vis.clear();
+    ss.clear();
+    for (int j = 0; j < qiedian[i].size(); j++) {
+        mpp[hao[i][j]] = qiedian[i][j];
+    }
+    for (int j = 0; j < qiedian[i].size(); j++) {
+        for (int k = 0; k < sad[hao[i][j]]; k++) {
+            if (mpp.count(ad[hao[i][j]][k]))ss[j]++;
+        }
+    }
+    int cnt = 0;
+    for (int j = 0; j < qiedian[i].size(); j++) {
+        if (ss[j] == 0)cnt++;
+    }
+    cerr << i << " " << cnt << endl;
+    qiedian[i].clear();
+    for (int j = 0; j < hao[i].size(); j++) {
+        if (ss[j] == 1 && vis[hao[i][j]] == 0) {
+            //lu(i, hao[i][j]);
+            break;
+        }
+    }
+}
 
 int main() {
     cout << fixed << setprecision(6);
@@ -278,7 +346,7 @@ int main() {
     }*/
     //cout << points.size();
     cerr << triangles.size() << endl;
-    for (int i = 0; i < triangles.size(); i++) {
+    for (int i = 0; i < triangles.size() ; i++) {
         for (int j = 0; j < triangles.size(); j++) {
             if (i == j)continue;
             point a1, a2, b1, b2, c1, c2;
@@ -318,11 +386,23 @@ int main() {
             if (flag) {
                 ad[i][sad[i]] = j;
                 ad[j][sad[j]] = i;
+                //if(i==2198)
+                    //cout << sad[i] << " " << ad[i][sad[i]] << endl;
                 sad[i]++;
                 sad[j]++;
+                //if (j == 2198) 
+                {
+                    //cout << i << " " << j << " " <<sad[j]<<" "<<ad[j][sad[j] - 1] << endl;
+                }
             }
+            /*if (ad[2198][0] != 0) {
+                cout << "!!!!!! " << i << " " << j << endl;
+                break;
+            }*/
         }
     }
+    //cout << "!" << ad[2198][0] << endl;
+    //cout << "!" << sad[2198] << endl;
     for (int i = 0; i < triangles.size(); i++) {
         if (sad[i] > 3) {
             cout << i << endl;
@@ -334,8 +414,8 @@ int main() {
             break;
         }
     }
-    //428 17093
-    double d = 8;
+    //456 3788
+    double d = 4;
     np.push_back(points[0]);
     for (int i = 1; i < points.size(); i++) {
         if (dis(np.back(), points[i]) >= d) {
@@ -358,11 +438,43 @@ int main() {
     int n2 = np.size();
     //cout << n2 << endl;
     for (int i = 0; i < np.size(); i++) {
-        mp.clear();
+        //mp.clear();
         for (int j = 0; j < triangles.size(); j++) {
-            judgejiao(i, j, fa[i], triangles[j].a, triangles[j].b);
-            judgejiao(i, j, fa[i], triangles[j].a, triangles[j].c);
-            judgejiao(i, j, fa[i], triangles[j].b, triangles[j].c);
+            point p1 = judgejiao(i, j, fa[i], triangles[j].a, triangles[j].b);
+            point p2 = judgejiao(i, j, fa[i], triangles[j].a, triangles[j].c);
+            point p3 = judgejiao(i, j, fa[i], triangles[j].b, triangles[j].c);
+            if (p1 == point(1000000007, 1000000007, 1000000007)) {
+                qiedian[i].push_back(triangles[j].a);
+                qiedian[i].push_back(triangles[j].b);
+                hao[i].push_back(j);
+                hao[i].push_back(j);
+            }
+            else if (p2 == point(1000000007, 1000000007, 1000000007)) {
+                qiedian[i].push_back(triangles[j].a);
+                qiedian[i].push_back(triangles[j].c);
+                hao[i].push_back(j);
+                hao[i].push_back(j);
+            }
+            else if (p3 == point(1000000007, 1000000007, 1000000007)) {
+                qiedian[i].push_back(triangles[j].b);
+                qiedian[i].push_back(triangles[j].c);
+                hao[i].push_back(j);
+                hao[i].push_back(j);
+            }
+            else {
+                if (!(p1 == point(-1000000007, -1000000007, -1000000007))) {
+                    qiedian[i].push_back(p1);
+                    hao[i].push_back(j);
+                }
+                if (!(p2 == point(-1000000007, -1000000007, -1000000007))) {
+                    qiedian[i].push_back(p2);
+                    hao[i].push_back(j);
+                }
+                if (!(p3 == point(-1000000007, -1000000007, -1000000007))) {
+                    qiedian[i].push_back(p3);
+                    hao[i].push_back(j);
+                }
+            }
         }
     }
     //freopen("../../3Dgujia/3Dgujia/cp.txt", "w", stdout);
@@ -375,7 +487,7 @@ int main() {
         }
     }*/
     for (int i = 1; i < np.size() - 1; i++) {
-        mp.clear();
+        //mp.clear();
         int sum = qiedian[i].size();
         int flag1 = 1, flag2 = 1;
         if (jiaoshe(i, i - 1) != 0)flag1 = 0;
@@ -420,29 +532,12 @@ int main() {
         cerr << hao[i].size() << " " << qiedian[i].size() << endl;
     }*/
     for (int i = 0; i < np.size(); i++) {
-        mpp.clear();
-        vis.clear();
-        ss.clear();
-        for (int j = 0; j < qiedian[i].size(); j++) {
-            mpp[hao[i][j]] = qiedian[i][j];
-        }
-        for (int j = 0; j < qiedian[i].size(); j++) {
-            for (int k = 0; k < sad[hao[i][j]]; k++) {
-                if (mpp.count(ad[hao[i][j]][k]))ss[j]++;
-            }
-        }
-        qiedian[i].clear();
-        for (int j = 0; j < hao[i].size(); j++) {
-            if (ss[j] == 1) {
-                lu(i, j);
-                break;
-            }
-        }
+        //findlu(i);
     }//求路径
     freopen("../../3Dgujia/3Dgujia/qiepian.txt", "w", stdout);
     for (int i = 0; i < np.size(); i++) {
         for (int j = 0; j < qiedian[i].size(); j++) {
-            //if (i <= 20&&i>=18)
+            //if (i <= 0)
             {
                 cout << qiedian[i][j].x << " " << qiedian[i][j].y << " " << qiedian[i][j].z << endl;
             }

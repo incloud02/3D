@@ -35,6 +35,9 @@ struct triangle {
     triangle(point a, point b, point c) :a(a), b(b), c(c) {}
 
 };
+void show(triangle a) {
+    cerr << a.a.x << " " << a.a.y << " " << a.a.z << endl << a.b.x << " " << a.b.y << " " << a.b.z << endl << a.c.x << " " << a.c.y << " " << a.c.z << endl;
+}
 vector<triangle>triangles;
 map<double, int>mp;
 int flag;
@@ -105,29 +108,19 @@ point recursive_bezier(const std::vector<point>& control_points, float t)
     return recursive_bezier(a, t);
 }
 
-void bezier(const std::vector<point>& control_points)
+vector<point> bezier(const std::vector<point>& control_points, int step)
 {
     // TODO: Iterate through all t = 0 to t = 1 with small steps, and call de Casteljau's 
     // recursive Bezier algorithm.
-    freopen("out.txt", "w", stdout);
-    double delta = 0.001;
+    //freopen("out.txt", "w", stdout);
+    vector<point>res;
+    double delta = 1. / step;
     for (double t = 0; t <= 1; t += delta) {
         auto point = recursive_bezier(control_points, t);
-        cout << point.x << ' ' << point.y << ' ' << point.z << '\n';
-        int w = 1;
-        for (int i = -w + 1; i <= w; i++) {
-            for (int j = -w + 1; j <= w; j++) {
-                for (int k = -w + 1; k <= w; k++) {
-                    double x = point.x + i, y = point.y + j, z = point.z + k;
-                    //cout << x << ' ' << y << ' ' << z << '\n';
-                    /*double dist = sqrt(pow(point.x - x, 2) + pow(point.y - y, 2) + pow(point.z - z, 2));
-                    window.at<cv::Vec3b>(z, y, x)[1] = std::min(window.at<cv::Vec3b>(z, y, x)[1] + 255 * std::max(2 - exp(dist), 0.0), 255.0);*/
-                }
-                // auto k = abs(((int)(point.x+1-i))-point.x) * abs(((int)(point.y+1-j))-point.y);
-                // window.at<cv::Vec3b>(y, x)[1] = std::min(window.at<cv::Vec3b>(y, x)[1] + 255 * k, 255.0f);
-            }
-        }
+        res.emplace_back(point);
+        //cout << point.x << ' ' << point.y << ' ' << point.z << '\n';
     }
+    return res;
 }
 
 void judgejiao(PM p, point a, point b) {
@@ -220,7 +213,7 @@ int main(int argc, char const* argv[])
     //////////////////////////////代码开始////////////////////////////
     cout << fixed << setprecision(6);
     vector<double> triangles_all;
-    read_stl("new.stl", triangles_all);
+    read_stl("pipe.stl", triangles_all);
     for (int i = 0;i < triangles_all.size();i += 9) {
         point a, b, c;
         a = point(triangles_all[i], triangles_all[i + 1], triangles_all[i + 2]);
@@ -229,6 +222,11 @@ int main(int argc, char const* argv[])
         triangle p = triangle(a, b, c);
         triangles.push_back(p);
     }
+    /*show(triangles[456]);
+    cerr << endl;
+    show(triangles[3788]);
+    cerr << endl;
+    show(triangles[4121]);*/
     //up存z最大的点,down存z最小的点avavbbab
     up.z = mi; down.z = ma;
     for (int i = 0; i < triangles.size(); ++i) {
@@ -253,7 +251,7 @@ int main(int argc, char const* argv[])
     }//找up和down点法式中的点
 
     //计算up的法向量
-    double X = 0, Y = 466 - 458, Z = 348 - 361;
+    double X = 0, Y = 37 - 15, Z = 240 - 270;
     double XX = 1, YY = 0, ZZ = 0;
     up.a = Y * ZZ - Z * YY;
     up.b = Z * XX - X * ZZ;
@@ -270,7 +268,7 @@ int main(int argc, char const* argv[])
 
     double len = 1;//平移时的长度
 
-    long long howmany = 90;//上下取多少层
+    long long howmany = 65;//上下取多少层
 
     //down面向上平移
     //freopen("CON", "w", stdout);
@@ -307,7 +305,7 @@ int main(int argc, char const* argv[])
         }
         mp.clear();
         if (flag != -1) {
-            if (ccnt > 15)//因为输入平面不完全平行，所以删除一些点数少的切面点
+            if (ccnt > 2)//因为输入平面不完全平行，所以删除一些点数少的切面点
                 points.push_back(point(xx, yy, zz));
         }
         flag = 0;
@@ -349,7 +347,7 @@ int main(int argc, char const* argv[])
         }
         mp.clear();
         if (flag != -1) {
-            if (ccnt > 10)//因为输入平面不完全平行，所以删除一些点数少的切面点
+            if (ccnt > 0)//因为输入平面不完全平行，所以删除一些点数少的切面点
                 tmppoints.push_back(point(xx, yy, zz));
         }
         flag = 0;
@@ -386,7 +384,10 @@ int main(int argc, char const* argv[])
         //points.emplace_back(i);
     }
 
-    bezier(bp);
-
+    auto out = bezier(bezier(bezier(bp, 1000), 100), 1000);
+    freopen("out.txt", "w", stdout);
+    for (auto& p : out) {
+        cout << p.x << ' ' << p.y << ' ' << p.z << '\n';
+    }
     return 0;
 }
