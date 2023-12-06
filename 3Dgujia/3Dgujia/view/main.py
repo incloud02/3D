@@ -9,7 +9,7 @@ All = np.loadtxt('../stl.txt', delimiter=' ')
 All = All.T
 print(All[0].size)
 
-#ax.scatter(All[0][::], All[1][::], All[2][::], c='r')
+# ax.scatter(All[0][::], All[1][::], All[2][::], c='r')
 
 All = np.loadtxt('../out.txt', delimiter=' ')
 All = All.T
